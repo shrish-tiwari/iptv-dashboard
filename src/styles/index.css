@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Roboto', sans-serif;
+  background-color: #141414;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #141414;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Modal and body scrollbar hidden to look cleaner */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- YAHAN SE CHANGES HAIN --- */
+
+/* 1. Swiper ke default icons ko hide karne ke liye */
+.swiper-button-next::after, 
+.swiper-button-prev::after {
+  display: none !important;
+}
+
+/* 2. Buttons ko premium aur sleek banane ke liye */
+.swiper-button-next, 
+.swiper-button-prev {
+  top: 0 !important;
+  bottom: 0 !important;
+  margin-top: 0 !important;
+  height: 100% !important; /* Full height buttons */
+  width: 50px !important;
+  background: rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease-in-out;
+  z-index: 50;
+  opacity: 0; /* Default hidden */
+}
+
+/* 3. Poori Row par hover karne par arrows dikhenge */
+.group:hover .swiper-button-next,
+.group:hover .swiper-button-prev {
+  opacity: 1;
+}
+
+/* 4. Arrows ke hover par background thoda dark hoga */
+.swiper-button-next:hover, 
+.swiper-button-prev:hover {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* 5. Left aur Right alignment */
+.swiper-button-prev {
+  left: 0 !important;
+}
+
+.swiper-button-next {
+  right: 0 !important;
+}
+
+/* Arrows ke icons ka size (FaChevron wale) */
+.swiper-button-next svg, 
+.swiper-button-prev svg {
+  font-size: 25px;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.swiper-button-next:hover svg, 
+.swiper-button-prev:hover svg {
+  transform: scale(1.3); /* Hover par icon thoda bada hoga */
+}
+
+/* index.css mein niche ye add karein */
+@keyframes scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.animate-poster-scroll {
+  animation: scroll 40s linear infinite;
+}
