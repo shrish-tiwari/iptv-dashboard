@@ -1,155 +1,96 @@
 /* src/custom-video-player.css */
 
-/* Base Player Styling */
 .video-js.vjs-theme-custom {
-    font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; /* A font similar to Netflix */
-    background-color: #000; /* Black background */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #fff;
 }
 
-/* Big Play Button (The large play icon in the center) */
+/* Remove default blue focus outlines */
+.video-js.vjs-theme-custom *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Big Play Button (Center) */
 .video-js.vjs-theme-custom .vjs-big-play-button {
-    background-color: rgba(229, 9, 20, 0.8); /* Netflix Red */
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    line-height: 60px; /* Center the icon */
-    font-size: 3em;
-    border: none;
+    width: 80px;
+    height: 80px;
+    line-height: 76px;
+    font-size: 3.5em;
     transition: all 0.3s ease;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 .video-js.vjs-theme-custom .vjs-big-play-button:hover {
-    background-color: rgba(255, 10, 20, 1); /* Brighter Red on hover */
-    transform: translate(-50%, -50%) scale(1.1); /* Slightly grow on hover */
+    background-color: rgba(229, 9, 20, 0.9); /* Red */
+    border-color: rgba(229, 9, 20, 0.9);
 }
 
-/* Control Bar (Bottom bar with controls) */
+/* Base Control Bar Background */
 .video-js.vjs-theme-custom .vjs-control-bar {
-    background-color: rgba(0, 0, 0, 0.7); /* Slightly transparent dark background */
-    height: 3.5em; /* Increase height for better touch/click experience */
-    font-size: 0.9em; /* Adjust font size for control items */
-    padding: 0 1em; /* Padding on sides */
+    background: rgba(0, 0, 0, 0.8);
+    height: 40px;
 }
 
-/* Progress Bar */
-.video-js.vjs-theme-custom .vjs-progress-control {
-    flex: 1; /* Allow progress bar to take available space */
-    position: absolute;
-    width: 100%;
-    left: 0;
-    top: -10px; /* Move progress bar slightly above control bar */
-    height: 10px; /* Make it thicker */
-    margin: 0;
-    cursor: pointer;
-}
-
-.video-js.vjs-theme-custom .vjs-progress-holder {
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.3); /* Lighter grey for remaining progress */
-    border-radius: 5px;
-}
-
+/* Progress Bar Colors */
 .video-js.vjs-theme-custom .vjs-play-progress {
-    background-color: #e50914; /* Netflix Red for played progress */
-    border-radius: 5px;
-    height: 100%;
+    background-color: #e50914; /* Red color */
 }
 
-.video-js.vjs-theme-custom .vjs-load-progress {
-    background-color: rgba(255, 255, 255, 0.2); /* Lighter shade for loaded part */
-}
-
-/* Scrubber (progress handle) */
 .video-js.vjs-theme-custom .vjs-slider-handle {
-    background-color: #e50914; /* Netflix Red */
-    border: 2px solid #fff; /* White border */
-    width: 16px;
-    height: 16px;
-    top: -3px; /* Adjust vertical position */
-    border-radius: 50%;
-    margin-left: -8px; /* Center the handle */
+    background-color: #e50914; /* Red dot */
 }
 
-/* Time Displays (Current and Duration) */
-.video-js.vjs-theme-custom .vjs-current-time,
-.video-js.vjs-theme-custom .vjs-duration {
-    color: #fff;
-    font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    font-size: 1.1em;
-}
-
-/* All Buttons (Play, Mute, Fullscreen, Settings etc.) */
-.video-js.vjs-theme-custom .vjs-control {
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    font-size: 1.6em; /* Adjust icon size */
-    margin: 0 0.5em; /* Spacing between buttons */
-    transition: color 0.2s ease;
-}
-
-.video-js.vjs-theme-custom .vjs-control:hover {
-    color: #e50914; /* Netflix Red on hover */
-}
-
-/* Play Toggle */
-.video-js.vjs-theme-custom .vjs-play-control {
-    font-size: 1.8em; /* Slightly larger play/pause icon */
-}
-
-/* Volume Panel */
+/* Fix Volume Slider shifting issue */
 .video-js.vjs-theme-custom .vjs-volume-panel {
-    width: 6em; /* Adjust width for volume slider */
+    width: 10em !important; /* Fixed width prevents shifting */
+    transition: none !important;
 }
 
 .video-js.vjs-theme-custom .vjs-volume-level {
-    background-color: #e50914; /* Red volume bar */
+    background-color: #e50914; /* Red volume */
 }
 
-.video-js.vjs-theme-custom .vjs-volume-handle {
-    background-color: #fff; /* White volume handle */
-    border-color: #e50914; /* Red border */
+/* All Buttons Hover Effect */
+.video-js.vjs-theme-custom .vjs-control:hover {
+    color: #e50914;
 }
 
-/* Settings Menu (Playback Speed, Quality) */
-.video-js.vjs-theme-custom .vjs-menu-button {
-    font-size: 1.6em; /* Gear icon size */
+/* Fix for HD Quality Button (Making it transparent with a border) */
+.video-js.vjs-theme-custom .vjs-hls-quality-selector {
+    background: transparent !important;
 }
 
-.video-js.vjs-theme-custom .vjs-menu {
-    background-color: rgba(0, 0, 0, 0.85); /* Darker background for menu */
-    border-radius: 5px;
-    padding: 0.5em 0;
-    max-height: 20em; /* Limit menu height */
-    overflow-y: auto;
+.video-js.vjs-theme-custom .vjs-hls-quality-selector .vjs-icon-placeholder {
+    color: #fff !important;
+    border: 1px solid #fff; /* Clean white border */
+    border-radius: 4px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
 }
 
-.video-js.vjs-theme-custom .vjs-menu-item {
-    color: #fff;
-    padding: 0.6em 1.5em;
-    font-size: 1.1em;
+.video-js.vjs-theme-custom .vjs-hls-quality-selector:hover .vjs-icon-placeholder {
+    color: #e50914 !important;
+    border-color: #e50914;
 }
 
-.video-js.vjs-theme-custom .vjs-menu-item:hover,
-.video-js.vjs-theme-custom .vjs-menu-item.vjs-selected {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #e50914; /* Red for selected item */
+/* Playback Speed Font */
+.video-js.vjs-theme-custom .vjs-playback-rate-value {
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
-/* Quality Selector specific styling */
-.video-js.vjs-theme-custom .vjs-quality-button .vjs-icon-placeholder::before {
-    content: "\f110"; /* Use a settings/gear icon for quality selector if default is not good */
-    /* Or you can use a custom SVG for the quality selector icon */
+/* Dropdown Menus */
+.video-js.vjs-theme-custom .vjs-menu-content {
+    background-color: rgba(20, 20, 20, 0.95);
 }
 
-.video-js.vjs-theme-custom .vjs-quality-button .vjs-menu-button-popup .vjs-icon-placeholder::before {
-    content: "\f110"; /* Gear icon for popup */
+.video-js.vjs-theme-custom .vjs-menu-item:hover {
+    background-color: #fff;
+    color: #000;
 }
-
-/* Hide default settings button if quality and playback rate are separate buttons */
-/* .video-js.vjs-theme-custom .vjs-settings-menu {
-    display: none;
-} */

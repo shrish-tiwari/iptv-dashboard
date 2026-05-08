@@ -17,7 +17,7 @@ import 'videojs-hls-quality-selector';
 
 // --- Custom CSS for a Netflix-like look (optional but recommended) ---
 // **IMPORTANT:** Path updated to use the '@' alias defined in vite.config.js
-'../assets/custom-video-player.css';
+import '../assets/custom-video-player.css';
 
 
 const WatchPage = () => {
@@ -138,10 +138,10 @@ const WatchPage = () => {
         <div className="h-screen w-full bg-black relative">
             {/* Back Button */}
             <div
-                className="absolute top-6 left-6 z-50 cursor-pointer text-white flex items-center gap-2 bg-black/50 p-2 rounded-full hover:bg-white/20 transition-all duration-300"
+                className="absolute top-24 left-6 z-50 cursor-pointer text-gray-200 flex items-center gap-2 bg-black/50 px-4 py-2 rounded-md hover:bg-red-600 hover:text-white transition-all duration-300"
                 onClick={() => navigate(-1)}
             >
-                <FaArrowLeft size={24} />
+                <FaArrowLeft size={20} />
                 <span className="hidden md:block text-lg font-semibold">Back</span>
             </div>
 
