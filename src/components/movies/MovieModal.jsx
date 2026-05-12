@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlay, FaPlus, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'; // 👈 Navigation ke liye import kiya
 
+// update all the useEffect to either to redux-toolkit ya in react-query
+
 /**
  * Helper: Individual Episode Row Component
  */
@@ -68,7 +70,7 @@ const MovieModal = ({ movie, onClose, allMovies }) => {
           
           {/* Banner Section */}
           <div className="h-[250px] md:h-[450px] relative">
-             <img src={movie.img} className="w-full h-full object-cover" alt="banner" />
+             <img src={movie.posterUrl} className="w-full h-full object-cover" alt="banner" />
              <div className="absolute inset-0 bg-gradient-to-t from-[#181818] to-transparent"></div>
              <div className="absolute bottom-4 left-4 text-left md:bottom-10 md:left-10">
                <h2 className="text-2xl md:text-5xl font-black mb-2 md:mb-6 drop-shadow-2xl uppercase italic">{movie.title}</h2>
@@ -144,6 +146,8 @@ export const MovieModalV2 = ({ movie, onClose, allMovies }) => {
   if (!movie) return null;
 
   const movieId = movie._id || movie.id;
+  console.log("the movie data is "+movie.img);
+  
   
   return (
     <AnimatePresence>
@@ -159,7 +163,7 @@ export const MovieModalV2 = ({ movie, onClose, allMovies }) => {
           </button>
           
           <div className="h-[250px] md:h-[480px] relative">
-             <img src={movie.img} className="w-full h-full object-cover" alt="banner" />
+             <img src={movie.img || "/default-banner.jpg"} className="w-full h-full object-cover" alt="banner" />
              <div className="absolute inset-0 bg-gradient-to-t from-[#181818] to-transparent"></div>
              <div className="absolute bottom-10 left-10">
                <h2 className="text-3xl md:text-6xl font-black mb-6 uppercase italic">{movie.title}</h2>

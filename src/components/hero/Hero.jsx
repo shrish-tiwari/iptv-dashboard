@@ -12,7 +12,7 @@ const Hero = ({ item, onMoreInfo }) => {
         initial={{ scale: 1.1 }}
         animate={{ scale: 1 }}
         transition={{ duration: 2 }}
-        src={item.img} 
+        src={item.posterUrl} 
         className="absolute inset-0 w-full h-full object-cover object-[center_20%] opacity-70" 
         alt="hero" 
       />

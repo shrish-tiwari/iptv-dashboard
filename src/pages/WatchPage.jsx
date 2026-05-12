@@ -121,12 +121,12 @@ const WatchPage = () => {
     }
 
     return (
-        <div className="h-screen w-full bg-black relative overflow-hidden group">
+        <div className="h-screen mt-20 py-5 w-full bg-black relative overflow-hidden group">
             {/* Back Button - Moved to top-10 for better immersion, added glassmorphism */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="absolute top-10 left-8 z-[100] cursor-pointer flex items-center gap-3 bg-black/40 backdrop-blur-xl border border-white/10 px-5 py-3 rounded-full text-white hover:bg-white hover:text-black transition-all duration-500 shadow-2xl active:scale-90"
+                className="absolut w-fit ml-5 top-10 left-8 z-[100] cursor-pointer flex items-center gap-3 bg-black/40 backdrop-blur-xl border border-white/10 px-5 py-3 rounded-full text-white hover:bg-white hover:text-black transition-all duration-500 shadow-2xl active:scale-90"
                 onClick={() => navigate(-1)}
             >
                 <FaArrowLeft size={18} />
@@ -134,7 +134,7 @@ const WatchPage = () => {
             </motion.div>
 
             {/* Video Player Container */}
-            <div className="w-full h-full flex items-center justify-center bg-black">
+            <div className="w-full h-full mt-0 flex items-center justify-center bg-black">
                 {streamUrl ? (
                     <div data-vjs-player className="w-full h-full">
                         <video
