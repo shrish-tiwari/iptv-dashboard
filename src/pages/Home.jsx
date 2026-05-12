@@ -3,8 +3,12 @@ import { useOutletContext } from 'react-router-dom';
 import Hero from '../components/hero/Hero';
 import MovieRow from '../components/movies/MovieRow';
 import MovieModal from '../components/movies/MovieModal';
-import { fetchMovies } from '../api/authService'; // API function
-import { CONTENT_DATA } from '../constants/movieData'; // Fallback Data
+import TrendingRank from '../components/movies/TrendingRank'; 
+import MovieSkeleton from '../components/skeleton/MovieSkeleton'; // 👈 Skeleton Import
+import HeroSkeleton from '../components/skeleton/HeroSkeleton';   // 👈 Skeleton Import
+import { fetchMovies } from '../api/authService'; 
+import { CONTENT_DATA } from '../constants/movieData'; 
+import { useWatchlist } from '../context/WatchlistContext'; 
 
 const Home = () => {
   const [category] = useOutletContext();
@@ -15,16 +19,15 @@ const Home = () => {
   const [moviesData, setMoviesData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Fetch Movies from API with Safety Extraction
+  // Watchlist state load kiya
+  const { watchlist } = useWatchlist();
+
+  // 1. Fetch Movies from API with Safety Extraction (Untouched Logic)
   useEffect(() => {
     const getMovies = async () => {
       try {
         const res = await fetchMovies();
-        
-        // --- SAFE DATA EXTRACTION ---
-        // Aapke API structure ke mutabik res.data.data mein array hai
         const rawData = res.data?.data || res.data?.movies || (Array.isArray(res.data) ? res.data : []);
-        
         setMoviesData(rawData);
       } catch (err) {
         console.error("❌ Error fetching movies from API:", err);
@@ -36,13 +39,12 @@ const Home = () => {
     getMovies();
   }, []);
 
-  // 2. SAFE Data Categorization Logic (Updated for API Object Structure)
+  // 2. SAFE Data Categorization Logic (Untouched Logic)
   const isDataValid = Array.isArray(moviesData);
 
   const apiMovies = isDataValid ? moviesData.filter(m => {
     const categoryName = m.category?.name?.toLowerCase() || "";
     const type = m.type?.toLowerCase() || "";
-    // Agar type 'movie' ho YA category name 'movie' ho YA category 'action/drama' ho (movies ke liye)
     return type === 'movie' || categoryName === 'movie' || categoryName === 'action' || categoryName === 'drama' || !type;
   }) : [];
 
@@ -66,7 +68,7 @@ const Home = () => {
   const allContent = [...displayMovies, ...displaySeries, ...displayShows];
   const heroContent = category === 'series' ? displaySeries : displayMovies;
 
-  // 3. Hero Interval logic
+  // 3. Hero Interval logic (Untouched Logic)
   useEffect(() => {
     if (heroContent.length === 0) return;
     const interval = setInterval(() => {
@@ -77,24 +79,34 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [heroContent]);
 
-  // Loading Screen
-  if (loading && moviesData.length === 0 && allContent.length === 0) {
+  // --- PREMIUM LOADING SCREEN (Updated with Skeletons) ---
+  if (loading && moviesData.length === 0) {
     return (
-      <div className="h-screen bg-black flex items-center justify-center text-white">
-        <div className="animate-pulse text-xl font-bold tracking-widest text-red-600">IPTV LOADING...</div>
+      <div className="bg-[#141414] min-h-screen overflow-hidden">
+        <HeroSkeleton />
+        <div className="relative z-20 px-4 md:px-12 -mt-16 md:-mt-20 space-y-8 md:space-y-12">
+          <MovieSkeleton />
+          <MovieSkeleton />
+          <MovieSkeleton />
+        </div>
       </div>
     );
   }
 
   return (
     <>
-      {/* Hero Section */}
+      {/* Hero Section (Untouched) */}
       {heroContent.length > 0 && (
         <Hero item={heroContent[currentIndex]} onMoreInfo={setSelectedMovie} />
       )}
 
       <div className="relative z-20 px-4 md:px-12 -mt-16 md:-mt-20 pb-10 md:pb-20 text-left space-y-8 md:space-y-12">
         
+        {/* --- 🏆 TOP 10 RANKING ROW --- */}
+        {(category === 'all' || category === 'movies') && (
+           <TrendingRank data={allContent} onSelect={setSelectedMovie} />
+        )}
+
         {(category === 'all' || category === 'movies') && (
            <MovieRow title="Blockbuster Movies" data={displayMovies} onSelect={setSelectedMovie} />
         )}
@@ -115,10 +127,15 @@ const Home = () => {
            <MovieRow title="Recently Added" data={[...allContent].sort(() => 0.5 - Math.random())} onSelect={setSelectedMovie} />
         )}
 
+        {/* --- MY LIST LOGIC (Untouched) --- */}
         {category === 'mylist' && (
-           <div className="py-10 md:py-20 text-center text-zinc-500 text-base md:text-xl border border-dashed border-zinc-700 rounded-xl mx-auto max-w-md">
-             Your list is empty. Start adding some content!
-           </div>
+           watchlist.length > 0 ? (
+             <MovieRow title="My Watchlist" data={watchlist} onSelect={setSelectedMovie} />
+           ) : (
+             <div className="py-10 md:py-20 text-center text-zinc-500 text-base md:text-xl border border-dashed border-zinc-700 rounded-xl mx-auto max-w-md animate-in fade-in zoom-in duration-500">
+               Your list is empty. Start adding some content!
+             </div>
+           )
         )}
 
         {category === 'all' && (

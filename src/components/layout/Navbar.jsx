@@ -3,16 +3,14 @@ import { FaSearch, FaBell, FaChevronDown } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from "../../hooks/useAuth";
+import { Search, Bell } from 'lucide-react'; // Premium icons
 
-/**
- * Navigation Constants
- */
 const NAV_ITEMS = [
-  { name: 'Home', id: 'all' },
-  { name: 'TV Series', id: 'series' },
-  { name: 'Movies', id: 'movies' },
-  { name: 'New & Popular', id: 'new' },
-  { name: 'My List', id: 'mylist' },
+  { name: 'Home', id: 'all', path: '/' },
+  { name: 'TV Series', id: 'series', path: '/tv-series' },
+  { name: 'Movies', id: 'movies', path: '/movies' },
+  { name: 'New & Popular', id: 'new', path: '/' },
+  { name: 'My List', id: 'mylist', path: '/mylist' },
 ];
 
 const Navbar = ({ setCategory, currentCategory }) => {
@@ -20,34 +18,30 @@ const Navbar = ({ setCategory, currentCategory }) => {
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
   
-  // useAuth se logout aur user data nikala
   const { logout, user } = useAuth(); 
 
-  // --- SCROLL LOGIC ---
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // --- UPDATED LOGOUT HANDLER ---
   const handleSignOut = () => {
-    // Ab ye asli logout trigger karega (API call + cleanup)
     logout(); 
   };
 
   return (
-    <nav className={`fixed top-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 py-3 transition-all duration-500 
-      ${isScrolled ? 'bg-[#141414] shadow-2xl border-b border-white/5' : 'bg-transparent'}`}>
+    <nav className={`fixed top-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 py-4 transition-all duration-700 
+      ${isScrolled ? 'bg-black/80 backdrop-blur-lg shadow-2xl border-b border-white/5' : 'bg-gradient-to-b from-black/70 to-transparent'}`}>
       
       {/* LEFT: Logo & Main Navigation */}
       <div className="flex items-center gap-10">
         <h1 
           onClick={() => {
             navigate('/'); 
-            setCategory('all'); 
+            if(setCategory) setCategory('all'); 
           }} 
-          className="text-[#E50914] text-4xl font-[900] tracking-tighter cursor-pointer drop-shadow-lg select-none"
+          className="text-[#E50914] text-3xl md:text-4xl font-[900] tracking-tighter cursor-pointer hover:scale-105 transition-transform active:scale-95 select-none"
         >
           IPTV
         </h1>
@@ -57,26 +51,33 @@ const Navbar = ({ setCategory, currentCategory }) => {
             <span 
               key={item.id} 
               onClick={() => {
-                navigate('/'); 
-                setCategory(item.id);
+                navigate(item.path); // Updated to navigate to correct route
+                if(setCategory) setCategory(item.id);
               }}
-              className={`cursor-pointer transition duration-300 
-                ${currentCategory === item.id ? 'text-white font-bold' : 'text-gray-300 hover:text-gray-400'}`}
+              className={`cursor-pointer transition-all duration-300 relative group
+                ${currentCategory === item.id ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
             >
               {item.name}
+              {currentCategory === item.id && (
+                <motion.div layoutId="activeTab" className="absolute -bottom-1 left-0 right-0 h-[2px] bg-red-600 rounded-full" />
+              )}
             </span>
           ))}
         </div>
       </div>
 
       {/* RIGHT: Actions & User Menu */}
-      <div className="flex items-center gap-6 text-xl">
-        <FaSearch className="cursor-pointer hover:text-red-600 transition text-lg md:text-xl" />
+      <div className="flex items-center gap-6">
+        {/* Search Icon - Now navigates to Search Page */}
+        <Search 
+          onClick={() => navigate('/search')} 
+          className="w-5 h-5 cursor-pointer hover:text-red-500 transition-colors" 
+        />
         
         {/* Notifications */}
         <div className="relative cursor-pointer group">
-          <FaBell className="text-lg md:text-xl" />
-          <span className="absolute -top-1 -right-1 bg-red-600 text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+          <Bell className="w-5 h-5 hover:text-red-500 transition-colors" />
+          <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold animate-pulse">
             3
           </span>
         </div>
@@ -87,40 +88,39 @@ const Navbar = ({ setCategory, currentCategory }) => {
           onMouseEnter={() => setShowProfile(true)} 
           onMouseLeave={() => setShowProfile(false)}
         >
-          <div className="flex items-center gap-2 cursor-pointer group">
+          <div className="flex items-center gap-2 cursor-pointer group p-1 rounded-full">
             <img 
               src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" 
-              className="w-8 h-8 rounded border border-transparent group-hover:border-white transition" 
+              className="w-8 h-8 rounded-md border-2 border-transparent group-hover:border-white transition-all duration-300" 
               alt="user" 
             />
-            <FaChevronDown className={`text-xs transition-transform duration-300 ${showProfile ? 'rotate-180' : ''}`} />
+            <FaChevronDown className={`text-[10px] transition-transform duration-500 ${showProfile ? 'rotate-180' : ''}`} />
           </div>
 
-          {/* Profile Dropdown */}
           <AnimatePresence>
             {showProfile && (
               <motion.div 
-                initial={{ opacity: 0, y: -10 }} 
-                animate={{ opacity: 1, y: 0 }} 
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute right-0 top-10 w-52 bg-black/95 border border-zinc-800 py-4 rounded shadow-2xl backdrop-blur-md"
+                initial={{ opacity: 0, y: 15, scale: 0.95 }} 
+                animate={{ opacity: 1, y: 0, scale: 1 }} 
+                exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                className="absolute right-0 top-12 w-56 bg-[#141414]/95 border border-white/10 py-3 rounded-lg shadow-2xl backdrop-blur-xl overflow-hidden"
               >
-                <div className="px-4 py-2 hover:bg-zinc-800 flex items-center gap-3 text-sm cursor-pointer transition">
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" className="w-6 h-6 rounded" alt="avatar" />
-                   {/* Login hue user ka naam dikhayega, fallback 'User' rakha hai */}
-                   <span className="font-bold">{user?.name || 'User'}</span>
+                <div className="px-4 py-3 hover:bg-white/10 flex items-center gap-3 text-sm cursor-pointer transition">
+                   <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" className="w-8 h-8 rounded shadow-md" alt="avatar" />
+                   <div className="flex flex-col">
+                      <span className="font-bold text-white">{user?.name || 'User'}</span>
+                      <span className="text-[10px] text-zinc-500 italic">Premium Member</span>
+                   </div>
                 </div>
                 
-                <hr className="border-zinc-800 my-2" />
+                <div className="h-[1px] bg-white/10 my-2 mx-4" />
                 
-                <div className="px-4 py-2 hover:bg-zinc-800 text-sm cursor-pointer transition text-zinc-300">
-                  Account Settings
-                </div>
+                <div className="px-4 py-2 hover:bg-white/10 text-xs cursor-pointer transition text-zinc-300">Account Settings</div>
+                <div className="px-4 py-2 hover:bg-white/10 text-xs cursor-pointer transition text-zinc-300">Help Center</div>
                 
-                {/* SIGN OUT BUTTON LINKED */}
                 <div 
                   onClick={handleSignOut}
-                  className="px-4 py-2 hover:bg-zinc-800 text-sm font-bold text-red-500 mt-2 border-t border-zinc-800 pt-3 text-center uppercase cursor-pointer transition"
+                  className="px-4 py-3 hover:bg-red-600 hover:text-white text-xs font-black text-red-500 mt-2 border-t border-white/5 text-center uppercase cursor-pointer transition-all duration-300"
                 >
                   Sign Out
                 </div>

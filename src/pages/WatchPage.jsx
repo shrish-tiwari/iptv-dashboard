@@ -3,43 +3,36 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import { getMovieWatchData } from '../api/movieService';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion'; // Added for smooth fade-in
 
 // --- Video.js imports ---
 import videojs from 'video.js';
-import '@videojs/http-streaming'; // HLS plugin for parsing .m3u8
-import 'video.js/dist/video-js.css'; // Video.js ka default CSS (base styling)
+import '@videojs/http-streaming'; 
+import 'video.js/dist/video-js.css'; 
 
 // --- Quality Levels Plugins ---
-// videojs-contrib-quality-levels: Yeh backend mein quality levels ko detect karta hai
 import 'videojs-contrib-quality-levels';
-// videojs-hls-quality-selector: Yeh UI mein dropdown provide karta hai quality switch karne ke liye
 import 'videojs-hls-quality-selector';
 
-// --- Custom CSS for a Netflix-like look (optional but recommended) ---
-// **IMPORTANT:** Path updated to use the '@' alias defined in vite.config.js
+// --- Custom CSS ---
 import '../assets/custom-video-player.css';
 
 
 const WatchPage = () => {
-    console.log("WatchPage component is rendering");
-
     const { id } = useParams();
     const navigate = useNavigate();
     const [streamUrl, setStreamUrl] = useState("");
     const [loading, setLoading] = useState(true);
 
-    const videoRef = useRef(null); // Ref for the actual <video> element
-    const playerRef = useRef(null); // Ref for the Video.js player instance
+    const videoRef = useRef(null); 
+    const playerRef = useRef(null); 
 
-    // --- 1. Fetch Movie Stream URL ---
+    // --- 1. Fetch Movie Stream URL (LOIGC UNTOUCHED) ---
     useEffect(() => {
         const fetchVideo = async () => {
             try {
                 setLoading(true);
                 const response = await getMovieWatchData(id);
-                console.log("API response for movie watch:", response);
-
-                // Safely get video URL from various possible backend keys
                 const videoUrl = response.videoUrl || response.url || response.streamUrl || response.data?.videoUrl;
 
                 if (videoUrl) {
@@ -56,25 +49,22 @@ const WatchPage = () => {
         };
 
         if (id) fetchVideo();
-    }, [id]); // Re-fetch if movie ID changes
+    }, [id]);
 
-    // --- 2. Initialize/Update Video.js Player ---
+    // --- 2. Initialize/Update Video.js Player (LOGIC UNTOUCHED) ---
     useEffect(() => {
-        // Only proceed if streamUrl is available and video element exists
         if (streamUrl && videoRef.current) {
-            // Video.js player configuration options
             const playerOptions = {
-                autoplay: true, // Auto-play the video
-                controls: true, // Show default player controls
-                responsive: true, // Player adjusts to container size
-                fluid: true, // Player takes up 100% width of its parent container
-                playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2], // Playback speed options
-                preload: 'auto', // Preload video metadata
+                autoplay: true,
+                controls: true,
+                responsive: true,
+                fluid: true,
+                playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+                preload: 'auto',
                 sources: [{
                     src: streamUrl,
-                    type: 'application/x-mpegURL' // Specify HLS stream type
+                    type: 'application/x-mpegURL' 
                 }],
-                // Custom component order for control bar (for a Netflix-like feel)
                 controlBar: {
                     children: [
                         'playToggle',
@@ -82,84 +72,87 @@ const WatchPage = () => {
                         'currentTimeDisplay',
                         'durationDisplay',
                         'volumePanel',
-                        'qualitySelector', // Add quality selector button here
-                        'playbackRateMenuButton', // Add playback speed button
+                        'qualitySelector',
+                        'playbackRateMenuButton',
                         'fullscreenToggle'
                     ]
                 }
             };
 
-            // Initialize or update the player instance
             if (!playerRef.current) {
-                // Player does not exist, create a new one
                 const player = videojs(videoRef.current, playerOptions, () => {
-                    console.log('Video.js player is ready and initialized!');
-                    // Optionally, play when ready
                     player.play();
                 });
                 playerRef.current = player;
-
-                // --- Initialize HLS Quality Selector ---
-                // This will add the quality dropdown button to the control bar
-                player.hlsQualitySelector({
-                    displayLabel: true, // Shows "Auto", "720p", etc. labels
-                });
+                player.hlsQualitySelector({ displayLabel: true });
             } else {
-                // Player already exists, update its source if streamUrl changes
-                console.log('Updating video source to:', streamUrl);
                 playerRef.current.src(playerOptions.sources);
-                playerRef.current.load(); // Load the new source
-                playerRef.current.play(); // Auto-play the new source
+                playerRef.current.load();
+                playerRef.current.play();
             }
         }
 
-        // Cleanup function: Dispose the player when component unmounts
         return () => {
             if (playerRef.current) {
                 playerRef.current.dispose();
                 playerRef.current = null;
-                console.log('Video.js player disposed on unmount.');
             }
         };
-    }, [streamUrl]); // Re-run this effect when streamUrl changes
+    }, [streamUrl]);
 
-    // --- Loading State UI ---
+    // --- Loading State UI (Refined) ---
     if (loading) {
         return (
-            <div className="h-screen bg-black flex items-center justify-center text-white">
-                <div className="animate-spin h-10 w-10 border-4 border-red-600 border-t-transparent rounded-full"></div>
-                <span className="ml-3 text-lg">Loading Movie...</span>
+            <div className="h-screen bg-[#0a0a0a] flex flex-col items-center justify-center text-white">
+                <div className="relative w-20 h-20">
+                    <div className="absolute inset-0 border-4 border-zinc-800 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-t-red-600 rounded-full animate-spin"></div>
+                </div>
+                <motion.span 
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    transition={{ repeat: Infinity, duration: 1, repeatType: "reverse" }}
+                    className="mt-6 text-xl font-black tracking-[0.2em] uppercase text-zinc-400"
+                >
+                    Buffering...
+                </motion.span>
             </div>
         );
     }
 
-    // --- Main Component Render ---
     return (
-        <div className="h-screen w-full bg-black relative">
-            {/* Back Button */}
-            <div
-                className="absolute top-24 left-6 z-50 cursor-pointer text-gray-200 flex items-center gap-2 bg-black/50 px-4 py-2 rounded-md hover:bg-red-600 hover:text-white transition-all duration-300"
+        <div className="h-screen w-full bg-black relative overflow-hidden group">
+            {/* Back Button - Moved to top-10 for better immersion, added glassmorphism */}
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="absolute top-10 left-8 z-[100] cursor-pointer flex items-center gap-3 bg-black/40 backdrop-blur-xl border border-white/10 px-5 py-3 rounded-full text-white hover:bg-white hover:text-black transition-all duration-500 shadow-2xl active:scale-90"
                 onClick={() => navigate(-1)}
             >
-                <FaArrowLeft size={20} />
-                <span className="hidden md:block text-lg font-semibold">Back</span>
-            </div>
+                <FaArrowLeft size={18} />
+                <span className="text-sm font-black uppercase tracking-widest">Back to Browse</span>
+            </motion.div>
 
             {/* Video Player Container */}
-            <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+            <div className="w-full h-full flex items-center justify-center bg-black">
                 {streamUrl ? (
-                    <div data-vjs-player className="w-full h-full flex items-center justify-center">
+                    <div data-vjs-player className="w-full h-full">
                         <video
                             ref={videoRef}
-                            // Apply custom class for styling Video.js player
-                            className="video-js vjs-theme-custom vjs-big-play-centered"
-                            // `vjs-theme-custom` will be defined in our custom CSS
+                            className="video-js vjs-theme-custom vjs-big-play-centered w-full h-full shadow-2xl"
                         />
                     </div>
                 ) : (
-                    <div className="h-full w-full flex flex-col items-center justify-center text-zinc-400 text-xl md:text-2xl font-semibold">
-                        <p>No video available at the moment.</p>
-                        <p className="text-sm mt-2">Please check back later or try a different movie.</p>
+                    <div className="h-full w-full flex flex-col items-center justify-center text-zinc-500 bg-[#0a0a0a]">
+                        <div className="text-6xl mb-4">⚠️</div>
+                        <p className="text-2xl font-black uppercase tracking-tighter">Content Unavailable</p>
+                        <p className="text-sm mt-2 text-zinc-600">This stream link has expired or is invalid.</p>
+                        <button 
+                            onClick={() => navigate(-1)}
+                            className="mt-8 px-8 py-2 border border-zinc-700 rounded-md hover:bg-white hover:text-black transition-all font-bold"
+                        >
+                            Go Back
+                        </button>
                     </div>
                 )}
             </div>
