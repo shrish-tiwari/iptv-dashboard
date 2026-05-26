@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react'; // 👈 useEffect add kiya scroll lock ke liye
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlay, FaPlus, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'; // 👈 Navigation ke liye import kiya
@@ -49,6 +49,15 @@ const RecommendationCard = ({ m }) => (
    ============================================================ */
 const MovieModal = ({ movie, onClose, allMovies }) => {
   const navigate = useNavigate(); // 👈 Hook initialize kiya
+
+  // ✅ Scroll Lock Logic: Jab modal khule toh background scroll na ho
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   if (!movie) return null;
   
   // Movie ID handle karne ke liye
@@ -69,10 +78,24 @@ const MovieModal = ({ movie, onClose, allMovies }) => {
           </button>
           
           {/* Banner Section */}
-          <div className="h-[250px] md:h-[450px] relative">
+          <div className="h-[250px] md:h-[450px] relative group/banner">
              <img src={movie.posterUrl} className="w-full h-full object-cover" alt="banner" />
+             
+             {/* ✅ CENTER PLAY BUTTON: Senior's Feedback */}
+             <div 
+               onClick={() => navigate(`/watch/${movieId}`)}
+               className="absolute inset-0 flex items-center justify-center z-50 cursor-pointer"
+             >
+                <motion.div 
+                  whileHover={{ scale: 1.2 }}
+                  className="w-16 h-16 md:w-24 md:h-24 bg-black/40 rounded-full border-2 border-white flex items-center justify-center backdrop-blur-sm hover:bg-red-600/60 transition-colors"
+                >
+                  <FaPlay className="text-white text-2xl md:text-4xl ml-1 md:ml-2" />
+                </motion.div>
+             </div>
+
              <div className="absolute inset-0 bg-gradient-to-t from-[#181818] to-transparent"></div>
-             <div className="absolute bottom-4 left-4 text-left md:bottom-10 md:left-10">
+             <div className="absolute bottom-4 left-4 text-left md:bottom-10 md:left-10 z-50">
                <h2 className="text-2xl md:text-5xl font-black mb-2 md:mb-6 drop-shadow-2xl uppercase italic">{movie.title}</h2>
                <div className="flex gap-2 md:gap-4">
                   {/* 👇 Yahan onClick add kiya hai movie play karne ke liye */}
@@ -143,6 +166,15 @@ const MovieModal = ({ movie, onClose, allMovies }) => {
    ============================================================ */
 export const MovieModalV2 = ({ movie, onClose, allMovies }) => {
   const navigate = useNavigate(); // 👈 Hook initialize kiya
+
+  // ✅ Scroll Lock Logic
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   if (!movie) return null;
 
   const movieId = movie._id || movie.id;
@@ -162,15 +194,29 @@ export const MovieModalV2 = ({ movie, onClose, allMovies }) => {
             <FaTimes />
           </button>
           
-          <div className="h-[250px] md:h-[480px] relative">
+          <div className="h-[250px] md:h-[480px] relative group/banner">
              <img src={movie.img || "/default-banner.jpg"} className="w-full h-full object-cover" alt="banner" />
+             
+             {/* ✅ CENTER PLAY BUTTON: MovieModalV2 */}
+             <div 
+               onClick={() => navigate(`/watch/${movieId}`)}
+               className="absolute inset-0 flex items-center justify-center z-50 cursor-pointer"
+             >
+                <motion.div 
+                  whileHover={{ scale: 1.2 }}
+                  className="w-16 h-16 md:w-24 md:h-24 bg-black/40 rounded-full border-2 border-white flex items-center justify-center backdrop-blur-sm"
+                >
+                  <FaPlay className="text-white text-2xl md:text-4xl ml-2" />
+                </motion.div>
+             </div>
+
              <div className="absolute inset-0 bg-gradient-to-t from-[#181818] to-transparent"></div>
-             <div className="absolute bottom-10 left-10">
+             <div className="absolute bottom-10 left-10 z-50">
                <h2 className="text-3xl md:text-6xl font-black mb-6 uppercase italic">{movie.title}</h2>
                {/* 👇 Yahan onClick add kiya hai */}
                <button 
                  onClick={() => navigate(`/watch/${movieId}`)}
-                 className="bg-white text-black px-12 py-3 rounded font-bold flex items-center gap-2"
+                 className="bg-white text-black px-12 py-3 rounded font-bold flex items-center gap-2 hover:bg-zinc-200 transition"
                >
                  <FaPlay /> {movie.progress > 0 ? "Resume" : "Play Now"}
                </button>

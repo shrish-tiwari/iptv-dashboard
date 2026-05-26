@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
-import { getMovieWatchData } from '../api/movieService';
+// import { getMovieWatchData } from '../api/movieService'; // 👈 Ab iski zaroorat nahi
+import { useGetMovieWatchDataQuery } from '../redux/api/movieApi'; // 👈 Naya RTK Query Hook
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion'; // Added for smooth fade-in
+import { motion } from 'framer-motion';
 
 // --- Video.js imports ---
 import videojs from 'video.js';
@@ -17,39 +18,36 @@ import 'videojs-hls-quality-selector';
 // --- Custom CSS ---
 import '../assets/custom-video-player.css';
 
-
 const WatchPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [streamUrl, setStreamUrl] = useState("");
-    const [loading, setLoading] = useState(true);
+    const { pathname } = useLocation();
+    
+    // --- 1. RTK Query Hook (LATEST REDUX LOGIC) ---
+    // Humne loading aur data ko wahi purane naam de diye hain
+    const { data: response, isLoading: loading, error } = useGetMovieWatchDataQuery(id);
+
+    // Stream URL extract karne ka logic bilkul wahi hai jo tune likha tha
+    const streamUrl = response?.videoUrl || response?.url || response?.streamUrl || response?.data?.videoUrl || "";
 
     const videoRef = useRef(null); 
     const playerRef = useRef(null); 
 
-    // --- 1. Fetch Movie Stream URL (LOIGC UNTOUCHED) ---
+    // Error handling ke liye ek chota useEffect (Logic preserved)
     useEffect(() => {
-        const fetchVideo = async () => {
-            try {
-                setLoading(true);
-                const response = await getMovieWatchData(id);
-                const videoUrl = response.videoUrl || response.url || response.streamUrl || response.data?.videoUrl;
+        if (error) {
+            toast.error("Failed to load movie. Please try again later.");
+            console.error("Error fetching movie stream:", error);
+        }
+        if (response && !streamUrl) {
+            toast.error("Video stream link not found for this movie!");
+        }
+    }, [error, response, streamUrl]);
 
-                if (videoUrl) {
-                    setStreamUrl(videoUrl);
-                } else {
-                    toast.error("Video stream link not found for this movie!");
-                }
-            } catch (err) {
-                toast.error("Failed to load movie. Please try again later.");
-                console.error("Error fetching movie stream:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
+      useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname]);
 
-        if (id) fetchVideo();
-    }, [id]);
 
     // --- 2. Initialize/Update Video.js Player (LOGIC UNTOUCHED) ---
     useEffect(() => {
@@ -100,7 +98,7 @@ const WatchPage = () => {
         };
     }, [streamUrl]);
 
-    // --- Loading State UI (Refined) ---
+    // --- Loading State UI (Refined - NO CHANGES) ---
     if (loading) {
         return (
             <div className="h-screen bg-[#0a0a0a] flex flex-col items-center justify-center text-white">
@@ -122,7 +120,7 @@ const WatchPage = () => {
 
     return (
         <div className="h-screen mt-20 py-5 w-full bg-black relative overflow-hidden group">
-            {/* Back Button - Moved to top-10 for better immersion, added glassmorphism */}
+            {/* Back Button (NO CHANGES) */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -133,7 +131,7 @@ const WatchPage = () => {
                 <span className="text-sm font-black uppercase tracking-widest">Back to Browse</span>
             </motion.div>
 
-            {/* Video Player Container */}
+            {/* Video Player Container (NO CHANGES) */}
             <div className="w-full h-full mt-0 flex items-center justify-center bg-black">
                 {streamUrl ? (
                     <div data-vjs-player className="w-full h-full">

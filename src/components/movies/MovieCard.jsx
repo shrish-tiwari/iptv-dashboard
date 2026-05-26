@@ -42,10 +42,11 @@ const MovieCard = ({ movie, onSelect }) => {
     <motion.div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      whileHover={isMobile ? { scale: 1.05, zIndex: 10, y: -5 } : { scale: 1.5, zIndex: 100, y: -40 }} 
+      // 👇 Bhai yahan scale 1.3 aur y -25 kiya hai taaki "chipping" na ho
+      whileHover={isMobile ? { scale: 1.05, zIndex: 10, y: -5 } : { scale: 1.5, zIndex: 100, y: 0 }} 
       transition={{ duration: 0.3, ease: "easeOut" }}
       onClick={() => onSelect(movie)} 
-      className="group relative h-40 md:h-44 cursor-pointer rounded-lg shadow-2xl border border-white/5 hover:border-zinc-500 bg-[#181818] transform-gpu overflow-hidden"
+      className=" h-40 md:h-44 cursor-pointer rounded-lg shadow-2xl border border-white/5 hover:border-zinc-500 bg-[#181818] transform-gpu overflow-hidden"
     >
       {/* 🖼️ Poster Image - Ab ye tabhi dikhega jab video na ho ya hover na ho */}
       <img 
@@ -57,27 +58,27 @@ const MovieCard = ({ movie, onSelect }) => {
 
       {/* 🎥 Video Preview - Instant Play */}
       {!isMobile && isHovered && (
-        <div className="absolute inset-0 z-10 w-full h-full bg-black">
+        <div className="absolute inset-0 z-5 w-full h-full bg-black">
           <video 
             src={trailerVideo}
             autoPlay
             muted
             loop
             playsInline
-            className="w-full h-full object-cover shadow-2xl"
+            className="w-full h-full object-cover z-10 shadow-2xl"
           />
         </div>
       )}
       
       {/* Progress Bar */}
       {movie.progress > 0 && (
-        <div className="absolute bottom-0 left-0 w-full h-[4px] bg-zinc-700/50 z-30 group-hover:opacity-0 transition-opacity">
-          <div className="h-full bg-red-600 shadow-[0_0_8px_rgba(229,9,20,0.8)]" style={{ width: `${movie.progress}%` }}></div>
+         <div className="absolute bottom-0 left-0 w-full h-[4px] bg-zinc-700/50 z-30 group-hover:opacity-0 transition-opacity"> 
+          {/* <div className="h-full bg-red-600 shadow-[0_0_8px_rgba(229,9,20,0.8)]" style={{ width: `${movie.progress}%` }}></div> */}
         </div>
       )}
 
       {/* Info Overlay - Z-index badha diya hai */}
-      <div className={`absolute inset-0 z-40 flex flex-col justify-end p-4 opacity-0 transition-all duration-300 bg-gradient-to-t from-black/100 via-black/20 to-transparent ${!isMobile ? 'group-hover:opacity-100' : 'hidden'}`}>
+      <div className={`absolute inset-0 z-5 flex flex-col justify-end p-4 opacity-0 transition-all duration-300 bg-gradient-to-t from-black/100 via-black/20 to-transparent ${!isMobile ? 'group-hover:opacity-100' : 'hidden'}`}>
         <div className="flex gap-2 mb-3">
           <div onClick={handlePlayClick} className="bg-white p-2 rounded-full text-black hover:bg-zinc-200 transition-all active:scale-90 shadow-lg cursor-pointer">
             <FaPlay className="text-[10px]" />

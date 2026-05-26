@@ -1,45 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useSelector } from 'react-redux'; // 👈 Redux se watchlist lene ke liye
+import { useGetAllMoviesQuery } from '../redux/api/movieApi'; // 👈 RTK Query Hook
 import Hero from '../components/hero/Hero';
 import MovieRow from '../components/movies/MovieRow';
 import MovieModal from '../components/movies/MovieModal';
 import TrendingRank from '../components/movies/TrendingRank'; 
-import MovieSkeleton from '../components/skeleton/MovieSkeleton'; // 👈 Skeleton Import
-import HeroSkeleton from '../components/skeleton/HeroSkeleton';   // 👈 Skeleton Import
-import { fetchMovies } from '../api/authService'; 
+import MovieSkeleton from '../components/skeleton/MovieSkeleton'; 
+import HeroSkeleton from '../components/skeleton/HeroSkeleton';   
+// import { fetchMovies } from '../api/authService'; // 👈 Ab iski zaroorat nahi
 import { CONTENT_DATA } from '../constants/movieData'; 
-import { useWatchlist } from '../context/WatchlistContext'; 
+// import { useWatchlist } from '../context/WatchlistContext'; // 👈 Context hat gaya
 
 const Home = () => {
   const [category] = useOutletContext();
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // API Data States
-  const [moviesData, setMoviesData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // --- 1. RTK QUERY FETCHING (LATEST REDUX LOGIC) ---
+  // Is 1 line ne useEffect aur manual states ko replace kar diya
+  const { data: res, isLoading: loading } = useGetAllMoviesQuery();
 
-  // Watchlist state load kiya
-  const { watchlist } = useWatchlist();
+  // Watchlist state Redux store se load kiya
+  const watchlist = useSelector((state) => state.watchlist.items);
 
-  // 1. Fetch Movies from API with Safety Extraction (Untouched Logic)
-  useEffect(() => {
-    const getMovies = async () => {
-      try {
-        const res = await fetchMovies();
-        const rawData = res.data?.data || res.data?.movies || (Array.isArray(res.data) ? res.data : []);
-        setMoviesData(rawData);
-      } catch (err) {
-        console.error("❌ Error fetching movies from API:", err);
-        setMoviesData([]); 
-      } finally {
-        setLoading(false);
-      }
-    };
-    getMovies();
-  }, []);
+  // API Data Extraction logic (Exactly same as your safety extraction)
+  const moviesData = res?.data?.data || res?.data?.movies || (Array.isArray(res?.data) ? res.data : res || []);
 
-  // 2. SAFE Data Categorization Logic (Untouched Logic)
+  // 2. SAFE Data Categorization Logic (UNTOUCHED LOGIC)
   const isDataValid = Array.isArray(moviesData);
 
   const apiMovies = isDataValid ? moviesData.filter(m => {
@@ -68,7 +56,7 @@ const Home = () => {
   const allContent = [...displayMovies, ...displaySeries, ...displayShows];
   const heroContent = category === 'series' ? displaySeries : displayMovies;
 
-  // 3. Hero Interval logic (Untouched Logic)
+  // 3. Hero Interval logic (UNTOUCHED LOGIC)
   useEffect(() => {
     if (heroContent.length === 0) return;
     const interval = setInterval(() => {
@@ -79,7 +67,7 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [heroContent]);
 
-  // --- PREMIUM LOADING SCREEN (Updated with Skeletons) ---
+  // --- PREMIUM LOADING SCREEN (UNTOUCHED UI) ---
   if (loading && moviesData.length === 0) {
     return (
       <div className="bg-[#141414] min-h-screen overflow-hidden">
@@ -127,7 +115,7 @@ const Home = () => {
            <MovieRow title="Recently Added" data={[...allContent].sort(() => 0.5 - Math.random())} onSelect={setSelectedMovie} />
         )}
 
-        {/* --- MY LIST LOGIC (Untouched) --- */}
+        {/* --- MY LIST LOGIC (UNTOUCHED) --- */}
         {category === 'mylist' && (
            watchlist.length > 0 ? (
              <MovieRow title="My Watchlist" data={watchlist} onSelect={setSelectedMovie} />

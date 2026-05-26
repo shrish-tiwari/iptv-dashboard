@@ -24,6 +24,11 @@ body {
   display: none;
 }
 
+
+  .swiper-slide { z-index: 1; }
+  .swiper-slide:hover { z-index: 100 !important; }
+
+  
 /* Swiper ke default icons ko hide karne ke liye */
 .swiper-button-next::after, 
 .swiper-button-prev::after {
